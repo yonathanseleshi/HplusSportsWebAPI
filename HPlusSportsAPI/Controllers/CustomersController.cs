@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using HPlusSportsAPI.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -26,9 +27,16 @@ namespace HPlusSportsAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllCustomers()
         {
-          var customers = await _context.Customer.ToListAsync();
+            var results = new ObjectResult(_context.Customer)
+            {
 
-            return Ok(customers);
+                StatusCode = (int) HttpStatusCode.OK
+
+            };
+
+          Request.HttpContext.Response.Headers.Add("Total Count", _context.Customer.CountAsync().ToString());
+
+            return results;
         }
 
         // GET api/customers/5
@@ -49,6 +57,12 @@ namespace HPlusSportsAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> PostCustomer([FromBody] Customer customer)
         {
+            if (!ModelState.IsValid)
+            {
+
+                return BadRequest(ModelState);
+            }
+
             await _context.Customer.AddAsync(customer);
             await _context.SaveChangesAsync();
 
