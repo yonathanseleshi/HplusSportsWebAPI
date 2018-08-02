@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using HPlusSportsAPI.Models;
+using HPlusSportsAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,28 +14,30 @@ namespace HPlusSportsAPI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class CustomersController : Controller
+
     {
-        private readonly HPlusSportsContext _context;
 
+        private readonly ICustomerRepository _customerRepository;
 
-        public CustomersController(HPlusSportsContext context)
+        public CustomersController(ICustomerRepository customerRepository)
         {
-            _context = context;
+            _customerRepository = customerRepository;
         }
 
 
         // GET api/customers
         [HttpGet]
-        public async Task<IActionResult> GetAllCustomers()
+        public IActionResult GetAllCustomers()
         {
-            var results = new ObjectResult(_context.Customer)
+            var results = new ObjectResult( _customerRepository.GetAll())
             {
 
-                StatusCode = (int) HttpStatusCode.OK
+                StatusCode = (int)HttpStatusCode.OK
 
             };
 
-          Request.HttpContext.Response.Headers.Add("Total Count", _context.Customer.CountAsync().ToString());
+            
+          Request.HttpContext.Response.Headers.Add("Total Count", _customerRepository.Count().ToString());
 
             return results;
         }
@@ -43,7 +46,8 @@ namespace HPlusSportsAPI.Controllers
         [HttpGet("{id}", Name = "GetCustomer")]
         public async Task <IActionResult> GetCustomer(int id)
         {
-            var customer = await _context.Customer.SingleOrDefaultAsync( x => x.CustomerId == id);
+
+            var customer = _customerRepository.Find(id);
 
             if (customer == null)
             {
@@ -63,8 +67,7 @@ namespace HPlusSportsAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            await _context.Customer.AddAsync(customer);
-            await _context.SaveChangesAsync();
+           await _customerRepository.Add(customer);
 
             return CreatedAtAction("GetCustomer", new {id = customer.CustomerId}, customer);
         }
@@ -74,8 +77,7 @@ namespace HPlusSportsAPI.Controllers
         public async Task<IActionResult> PutCustomer(int id, [FromBody] Customer customer)
         {
 
-            _context.Entry(customer).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            
 
             return Ok(customer);
         }
@@ -85,10 +87,7 @@ namespace HPlusSportsAPI.Controllers
         public async Task<IActionResult> DeleteCustomer(int id)
         {
 
-            var customer = await _context.Customer.SingleOrDefaultAsync(x => x.CustomerId == id);
-
-            _context.Customer.Remove(customer);
-            await _context.SaveChangesAsync();
+            var customer = _customerRepository.Remove(id);
 
             return Ok(customer);
         }
