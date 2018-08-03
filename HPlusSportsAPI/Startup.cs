@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HPlusSportsAPI.Models;
 using HPlusSportsAPI.Repositories;
+using HPlusSportsAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -31,12 +32,19 @@ namespace HPlusSportsAPI
 
 
 
-            services.AddDbContext<HPlusSportsContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("HPlusDatabase")));
 
             services.AddScoped<ICustomerRepository, CustomerRepository>();
+            services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ISalespersonRepository, SalespersonRepository>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc();
+
+            string conn = Configuration.GetConnectionString("HPlusDatabase");
+
+            services.AddDbContext<HPlusSportsContext>(options =>
+                options.UseSqlServer(conn));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

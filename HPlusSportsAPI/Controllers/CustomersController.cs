@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using HPlusSportsAPI.Models;
-using HPlusSportsAPI.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using HPlusSportsAPI.Models;
+using System.Net;
+using HPlusSportsAPI.Repositories.Interfaces;
 
 namespace HPlusSportsAPI.Controllers
 {
     [Produces("application/json")]
-    [Route("api/[controller]")]
-    [ApiController]
+    [Route("api/Customers")]
     public class CustomersController : Controller
-
     {
-
         private readonly ICustomerRepository _customerRepository;
 
         public CustomersController(ICustomerRepository customerRepository)
@@ -24,30 +19,35 @@ namespace HPlusSportsAPI.Controllers
             _customerRepository = customerRepository;
         }
 
-
-        // GET api/customers
-        [HttpGet]
-        public IActionResult GetAllCustomers()
+        private async Task<bool> CustomerExists(int id)
         {
-            var results = new ObjectResult( _customerRepository.GetAll())
+            return await _customerRepository.Exist(id);
+        }
+
+        [HttpGet]
+        [Produces(typeof(DbSet<Customer>))]
+        public IActionResult GetCustomer()
+        {
+            var results = new ObjectResult(_customerRepository.GetAll())
             {
-
                 StatusCode = (int)HttpStatusCode.OK
-
             };
 
-            
-          Request.HttpContext.Response.Headers.Add("Total Count", _customerRepository.Count().ToString());
+            Request.HttpContext.Response.Headers.Add("X-Total-Count", _customerRepository.GetAll().Count().ToString());
 
             return results;
         }
 
-        // GET api/customers/5
-        [HttpGet("{id}", Name = "GetCustomer")]
-        public async Task <IActionResult> GetCustomer(int id)
+        [HttpGet("{id}")]
+        [Produces(typeof(Customer))]
+        public async Task<IActionResult> GetCustomer([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            var customer = _customerRepository.Find(id);
+            var customer = await _customerRepository.Find(id);
 
             if (customer == null)
             {
@@ -57,39 +57,70 @@ namespace HPlusSportsAPI.Controllers
             return Ok(customer);
         }
 
-        // POST api/customers
+        [HttpPut("{id}")]
+        [Produces(typeof(Customer))]
+        public async Task<IActionResult> PutCustomer([FromRoute] int id, [FromBody] Customer customer)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (id != customer.CustomerId)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                await _customerRepository.Update(customer);
+                return Ok(customer);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await CustomerExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            
+        }
+
         [HttpPost]
+        [Produces(typeof(Customer))]
         public async Task<IActionResult> PostCustomer([FromBody] Customer customer)
         {
             if (!ModelState.IsValid)
             {
-
                 return BadRequest(ModelState);
             }
 
-           await _customerRepository.Add(customer);
+            await _customerRepository.Add(customer);
 
-            return CreatedAtAction("GetCustomer", new {id = customer.CustomerId}, customer);
+            return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
         }
 
-        // PUT api/customers/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(int id, [FromBody] Customer customer)
-        {
-
-            
-
-            return Ok(customer);
-        }
-
-        // DELETE api/customers/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCustomer(int id)
+        [Produces(typeof(Customer))]
+        public async Task<IActionResult> DeleteCustomer([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            var customer = _customerRepository.Remove(id);
+            if (! await CustomerExists(id))
+            {
+                return NotFound();
+            }
 
-            return Ok(customer);
+            await _customerRepository.Remove(id);
+
+            return Ok();
         }
     }
 }
