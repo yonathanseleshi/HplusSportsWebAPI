@@ -9,6 +9,9 @@ API deployed to Azure App Services and available at:
 http://hplussportsapidemo.azurewebsites.net
 
 Paths:
+\n
 Customers - /api/customers/{id}
+\n
 Products - /api/products
+\n
 Orders - /api/orders
