@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,16 +27,13 @@ namespace HPlusSportsAPI.Controllers
 
         [HttpGet]
         [Produces(typeof(DbSet<Customer>))]
-        public IActionResult GetCustomer()
+        public async Task<IActionResult> GetCustomer()
         {
-            var results = new ObjectResult(_customerRepository.GetAll())
-            {
-                StatusCode = (int)HttpStatusCode.OK
-            };
+            var results = await _customerRepository.GetAll();
+            
 
-            Request.HttpContext.Response.Headers.Add("X-Total-Count", _customerRepository.GetAll().Count().ToString());
-
-            return results;
+            
+            return Ok(results);
         }
 
         [HttpGet("{id}")]

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HPlusSportsAPI.Models;
 using HPlusSportsAPI.Repositories.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HPlusSportsAPI.Repositories
 {
@@ -34,9 +35,9 @@ namespace HPlusSportsAPI.Repositories
             return await _context.Customer.Include(customer => customer.Order).SingleOrDefaultAsync(a => a.CustomerId == id);
         }
 
-        public IEnumerable<Customer> GetAll()
+        public Task<List<Customer>> GetAll()
         {
-            return _context.Customer;
+            return  _context.Customer.ToListAsync();
         }
 
         public async Task<Customer> Remove(int id)

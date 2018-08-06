@@ -10,7 +10,7 @@ namespace HPlusSportsAPI.Repositories.Interfaces
     {
         Task<Customer> Add(Customer customer);
 
-        IEnumerable<Customer> GetAll();
+        Task<List<Customer>> GetAll();
 
         Task<Customer> Find(int id);
 
