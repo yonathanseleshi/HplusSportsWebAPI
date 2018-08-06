@@ -66,5 +66,29 @@ namespace HPlusSports.tests
 
         }
 
+        [TestMethod]
+        public void PostCustomer_ReturnBadRequest_IfModelIsInvalid()
+        {
+
+
+            var mockRepo = new Mock<ICustomerRepository>();
+            mockRepo.Setup(m => m.GetAll()).Returns(Task.FromResult(GetCustomers()));
+
+
+            var customersController = new CustomersController(mockRepo.Object);
+
+            customersController.ModelState.AddModelError("FirstName", "Required");
+
+            var customer = new Customer()
+            {
+                CustomerId = 4,
+
+            };
+
+            var response = customersController.PostCustomer(customer);
+
+            Assert.IsInstanceOfType(response.Result, typeof(BadRequestObjectResult));
+
+        }
     }
 }
