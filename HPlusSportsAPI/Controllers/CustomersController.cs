@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using HPlusSportsAPI.Models;
 using System.Net;
 using HPlusSportsAPI.Repositories.Interfaces;
+using Microsoft.Extensions.Logging;
+using NLog.LayoutRenderers;
 
 namespace HPlusSportsAPI.Controllers
 {
@@ -14,10 +16,12 @@ namespace HPlusSportsAPI.Controllers
     public class CustomersController : Controller
     {
         private readonly ICustomerRepository _customerRepository;
+        private ILogger<CustomersController> _logger;
 
-        public CustomersController(ICustomerRepository customerRepository)
+        public CustomersController(ICustomerRepository customerRepository, ILogger<CustomersController> logger)
         {
             _customerRepository = customerRepository;
+            _logger = logger;
         }
 
         private async Task<bool> CustomerExists(int id)
@@ -29,6 +33,8 @@ namespace HPlusSportsAPI.Controllers
         [Produces(typeof(DbSet<Customer>))]
         public async Task<IActionResult> GetCustomer()
         {
+            _logger.LogInformation("GetCustomer action called.  Get all customers from the database.");
+
             var results = await _customerRepository.GetAll();
             
 
