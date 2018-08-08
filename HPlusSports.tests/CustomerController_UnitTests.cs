@@ -9,8 +9,10 @@ using HPlusSportsAPI.Models;
 using HPlusSportsAPI.Repositories;
 using HPlusSportsAPI.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NLog;
 
 namespace HPlusSports.tests
 {
@@ -49,13 +51,18 @@ namespace HPlusSports.tests
         [TestMethod]
         public void GetCustomers_ReturnsAllCustomers()
         {
+
             
 
             var mockRepo = new Mock<ICustomerRepository>();
+
+            var logger = Mock.Of<ILogger<CustomersController>>();
+
+
             mockRepo.Setup(m => m.GetAll()).Returns(Task.FromResult(GetCustomers()));
 
       
-            var customersController = new CustomersController(mockRepo.Object);
+            var customersController = new CustomersController(mockRepo.Object, logger);
 
             var response = customersController.GetCustomer();
             
@@ -74,8 +81,10 @@ namespace HPlusSports.tests
             var mockRepo = new Mock<ICustomerRepository>();
             mockRepo.Setup(m => m.GetAll()).Returns(Task.FromResult(GetCustomers()));
 
+            var logger = Mock.Of<ILogger<CustomersController>>();
 
-            var customersController = new CustomersController(mockRepo.Object);
+
+            var customersController = new CustomersController(mockRepo.Object, logger);
 
             customersController.ModelState.AddModelError("FirstName", "Required");
 

@@ -46,10 +46,7 @@ namespace HPlusSportsAPI.Controllers
         [Produces(typeof(Customer))]
         public async Task<IActionResult> GetCustomer([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        
 
             var customer = await _customerRepository.Find(id);
 
@@ -67,6 +64,7 @@ namespace HPlusSportsAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogError("Customer model submitted invalid");
                 return BadRequest(ModelState);
             }
 
@@ -100,6 +98,8 @@ namespace HPlusSportsAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
+
+                _logger.LogError("Customer model submitted invalid");
                 return BadRequest(ModelState);
             }
 
@@ -112,13 +112,11 @@ namespace HPlusSportsAPI.Controllers
         [Produces(typeof(Customer))]
         public async Task<IActionResult> DeleteCustomer([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+          
 
             if (! await CustomerExists(id))
             {
+                _logger.LogError("Customer delete request error: Customer does not exist");
                 return NotFound();
             }
 
