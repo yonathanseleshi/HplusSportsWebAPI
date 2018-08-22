@@ -12,6 +12,7 @@ using NLog.LayoutRenderers;
 namespace HPlusSportsAPI.Controllers
 {
     [Produces("application/json")]
+    [ApiVersion("1.0")]
     [Route("api/Customers")]
     public class CustomersController : Controller
     {

@@ -7,6 +7,7 @@ using HPlusSportsAPI.Models;
 namespace HPlusSportsAPI.Controllers
 {
     [Produces("application/json")]
+    [ApiVersion("1.0")]
     [Route("api/Orders")]
     public class OrdersController : Controller
     {

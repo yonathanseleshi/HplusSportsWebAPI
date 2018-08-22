@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HPlusSportsAPI", "HPlusSportsAPI\HPlusSportsAPI.csproj", "{5E7B3BCB-53A5-42EA-9F14-3A8027079E1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HPlusSports.tests", "HPlusSports.tests\HPlusSports.tests.csproj", "{AEB39E51-FCAC-4008-B25A-ED0A73FB4FCD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HPlusSports.tests", "HPlusSports.tests\HPlusSports.tests.csproj", "{AEB39E51-FCAC-4008-B25A-ED0A73FB4FCD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
